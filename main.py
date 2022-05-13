@@ -4,41 +4,53 @@ import os
 
 
 def doWork():
-    print("Enter directory to begin conversions")
-    targetDirectory = input()
-    print(targetDirectory)
-    filesFound = scanFiles(targetDirectory)
+    repeatCheck = True
 
-    print(str(len(filesFound)) + " files were found")
-    print("Delete original file after conversion? (1) yes (2) no")
-    ans = input()
+    while(repeatCheck):
+        print("Enter directory to begin conversions")
+        targetDirectory = input()
+        filesFound = scanFiles(targetDirectory)
+        print(str(len(filesFound)) + " files were found\n")
 
-    for file in filesFound:
-        convert(targetDirectory, file)
-        if ans == "1":
-            print("Deleting " + file)
-            os.remove(targetDirectory + "/" + file)
+        print(
+            "(1) JPEG\n" +
+            "(2) PNG - This option often makes files bigger than original\n" +
+            "Select which type to convert to:"
+        )
 
-    print("CONVERSIONS DONE")
+        convertAns = input()
 
-    if ans == "2":
-        print("Delete all webp files that were converted? (1) yes (2) no")
-        answer = input()
+        print(
+            "Delete original webp file after conversion?\n" +
+            "Note: undeleted files will be moved to a new folder called 'WEBP'\n" +
+            "(1) yes\n" +
+            "(2) no"
+        )
+        deleteAns = input()
 
-        if answer == "1":
-            print("Deleting files...")
-            for file in filesFound:
+        for file in filesFound:
+            convert(targetDirectory, file, convertAns)
+            if deleteAns == "1":
+                print("Deleting " + file)
                 os.remove(targetDirectory + "/" + file)
-        elif answer == "2":
-            print("Moving files to new folder named 'WEBP'")
-            newFolder = targetDirectory + "/WEBP"
-            for file in filesFound:
+            elif deleteAns == "2":
+                print("Moving " + file)
+                newFolder = targetDirectory + "/WEBP"
                 if not os.path.exists(newFolder):
                     os.makedirs(newFolder)
 
                 os.replace(targetDirectory + "/" +
                            file, newFolder + "/" + file)
-            print("DONE")
+        print("CONVERSIONS DONE\n")
+        print("Do another folder?\n(1) yes\n(2) no")
+        repeatAns = input()
+        if repeatAns == "1":
+            repeatCheck = True
+        elif repeatAns == "2":
+            repeatCheck = False
+
+        if(repeatCheck == False):
+            break
 
     print("Closing program...")
 
@@ -52,9 +64,13 @@ def scanFiles(directory):
     return files
 
 
-def convert(directory, filename):
+def convert(directory, filename, convertAns):
     im = Image.open(directory + "/" + filename).convert("RGB")
-    im.save(directory + "/" + filename.replace(".webp", ".jpg"), "jpeg")
+
+    if convertAns == "1":
+        im.save(directory + "/" + filename.replace(".webp", ".jpg"), "jpeg")
+    elif convertAns == "2":
+        im.save(directory + "/" + filename.replace(".webp", ".png"), "png")
 
 
 if __name__ == "__main__":
