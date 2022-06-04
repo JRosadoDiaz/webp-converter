@@ -141,6 +141,8 @@ class MainWindow(QMainWindow):
                                                     self.directoryLine.text() + '/WEBP\n')
                 self.convertLog.insertPlainText("Conversions Finished!\n")
 
+            self.verifyCheck = False
+
     def findFiles(self):
         temp = []
         for filename in os.listdir(self.directoryLine.text()):
